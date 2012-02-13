@@ -1,1 +1,56 @@
-Net::IPInfoDB -- Perl Interface to ipinfodb.com
+NAME
+    Net::IPInfoDB - Perl interface to ipinfodb.com's Geolocation XML API
+
+SYNOPSIS
+        use Net::IPInfoDB;
+
+        my $g = Net::IPInfoDB->new($key);
+        my $c = $g->get_city("128.103.1.1");
+
+USAGE
+    "Net::IPInfoDB" makes use of the Free Geolocation API from ipinfodb.com.
+    Note that you'll need to register your app for a (free) API key in order
+    to use this module. Information on the API is available at
+    "http://ipinfodb.com/ip_location_api.php".
+
+    Basic usage follows the API petty closely:
+
+        use Net::IPInfoDB;
+
+        my $g = Net::IPInfoDB->new;
+        $g->key($api_key);
+
+        my $ip_info = $g->get_country($ip_address);
+
+METHODS
+    new Creates a new "Net::IPInfoDB" instance.
+
+        Optionally takes a key as the first argument; if provided, will call
+        the "key" method for you. If the $ENV{IPINFODB_TOKEN} exists,
+        "Net::IPInfoDB" assumes it contains the token and will call
+        "key($ENV{IPINFODB_TOKEN})" for you.
+
+    key Use "key" to specify your API key. Calling "get_city" or
+        "get_country" without specifying a key will result in a failure.
+
+    get_country
+        Returns country-level details about the host or ip address. Takes an
+        IP address or hostname as the only argument.
+
+    get_city
+        Returns city-level details, which is more resource-intensive on the
+        server. If you only need the country name, avoid using the city
+        precision API.
+
+CACHING
+    "Net::IPInfoDB" does *not* do any caching of responses. You should
+    definitely cache your responses using "Cache::Cache" or something
+    similar.
+
+AUTHOR
+    Darren Chamberlain <darren@cpan.org>
+
+VERSION
+    This is version 3.0. Note that the major version of "Net::IPInfoDB"
+    matches the ipinfodb.com API version.
+

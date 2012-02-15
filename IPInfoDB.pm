@@ -118,6 +118,9 @@ struct(
     '_raw'    => '$',
 );
 
+sub fields {
+    return @Net::IPInfoDB::FIELDS;
+}
 
 1;
 

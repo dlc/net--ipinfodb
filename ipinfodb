@@ -26,9 +26,13 @@ my $meth = $opt_C ? 'get_city' : 'get_country';
 
 my $g = Net::IPInfoDB->new($opt_t);
 
-for (@ARGV) {
-    my $d = $g->$meth($_);
-    while (my ($k, $v) = each %$d) {
-        print "$k => $v\n";
+for (my $i = 0; $i < @ARGV; $i++) {
+    my $r = $g->$meth($ARGV[ $i ]);
+    for my $f ($r->fields) {
+        my $val = $r->$f;
+        printf "%s: %s\n", $f, $val
+            if defined $val;
     }
+
+    print "-- \n" unless $i == (@ARGV - 1);
 }

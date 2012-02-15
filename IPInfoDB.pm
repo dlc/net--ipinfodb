@@ -139,7 +139,7 @@ Net::IPInfoDB - Perl interface to ipinfodb.com's Geolocation XML API
 
 =head1 USAGE
 
-C<Net::IPInfoDB> makes use of the Free Geolocation API from
+C<Net::IPInfoDB> makes use of the free Geolocation API from
 ipinfodb.com. Note that you'll need to register your app for a
 (free) API key in order to use this module. Information on the API
 is available at C<http://ipinfodb.com/ip_location_api.php>.
@@ -151,7 +151,14 @@ Basic usage follows the API petty closely:
     my $g = Net::IPInfoDB->new;
     $g->key($api_key);
 
-    my $ip_info = $g->get_country($ip_address);
+    my $addr = $g->get_city($ip_address);
+
+Get data from the returned object via method calls:
+
+    printf "%s is located at (%s, %s)\n",
+        $addr->ip_address, $addr->latitude, $addr->longitude;
+
+These methods are detailed below.
 
 =head1 METHODS
 
@@ -174,13 +181,14 @@ C<get_country> without specifying a key will result in a failure.
 =item get_country
 
 Returns country-level details about the host or ip address. Takes an
-IP address or hostname as the only argument.
+IP address or hostname as the only argument. Returns a
+C<Net::IPInfoDB::Result> object.
 
 =item get_city
 
 Returns city-level details, which is more resource-intensive on the
 server. If you only need the country name, avoid using the city
-precision API.
+precision API. Returns a C<Net::IPInfoDB::Result> object.
 
 =back
 
@@ -189,6 +197,53 @@ precision API.
 C<Net::IPInfoDB> does I<not> do any caching of responses. You should
 definitely cache your responses using C<Cache::Cache> or something
 similar.
+
+=head1 Net::IPInfoDB::Results object
+
+The C<get_city> and C<get_country> methods return a
+C<Net::IPInfoDB::Result> object, which has the following read-only
+methods, which correspond directly to the data returned:
+
+=over 4
+
+=item status_code
+
+=item status_message
+
+=item ip_address
+
+=item country_code
+
+=item country_name
+
+=item region_name
+
+=item city_name
+
+=item zip_code
+
+=item latitude
+
+=item longitude
+
+=item timezone
+
+=back
+
+There is also the following additional methods:
+
+=over 4
+
+=item web_uri
+
+C<web_uri> returns the web URI of the IP, for fancier viewing.
+
+=item fields
+
+C<fields> returns an array of fieldnames in the
+C<Net::IPInfoDB::Result> object, for iteration.
+
+=back
 
 =head1 AUTHOR
 

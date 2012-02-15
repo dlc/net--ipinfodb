@@ -6,7 +6,6 @@ WriteMakefile(
     'VERSION_FROM'  => 'IPInfoDB.pm',
     'PREREQ_PM'     => {
         'LWP::Simple'   => '5.0',
-        'JSON'          => '2.53',
     },
     'clean'         => {
         'FILES' => '$(DISTVNAME).tar$(SUFFIX) *.ppd',
@@ -14,5 +13,8 @@ WriteMakefile(
     'dist'          => {
         PREOP => 'perldoc -t IPInfoDB.pm > README',
     },
+    EXE_FILES       => [
+        'ipinfodb',
+    ],
     'AUTHOR'        => 'Darren Chamberlain <darren@cpan.org>',
 );

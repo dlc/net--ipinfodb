@@ -2,6 +2,6 @@
 .svn
 CVS
 Makefile
-Net-IPInfoDB-3.0.tar.gz
+Net-IPInfoDB-*.tar.gz
 blib
 pm_to_blib

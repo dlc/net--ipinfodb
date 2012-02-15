@@ -5,11 +5,11 @@ package Net::IPInfoDB;
 # ----------------------------------------------------------------------
 
 use strict;
-use vars qw($VERSION $DEBUG);
+use vars qw($VERSION $DEBUG @FIELDS);
 use vars qw($API_URI $API_VERSION);
+use vars qw($WEB_URI);
 
 use LWP::Simple qw(get);
-use JSON qw(decode_json);
 use URI;
 
 $VERSION = '3.0';
@@ -17,6 +17,10 @@ $DEBUG = 0 unless defined $DEBUG;
 
 $API_URI = 'http://api.ipinfodb.com';
 $API_VERSION = 'v3';
+
+$WEB_URI = 'http://ipinfodb.com/ip_locator.php?ip=';
+@FIELDS = qw(status_code status_message ip_address country_code country_name
+             region_name city_name zip_code latitude longitude timezone);
 
 sub new {
     my $class = shift;
@@ -75,26 +79,47 @@ sub _get {
     my $self = shift;
     my $meth = shift;
     my $addr = shift;
-    my ($raw, $data);
+    my $raw;
+    my $res = Net::IPInfoDB::Result->new;
 
     my $uri = URI->new("$API_URI/$API_VERSION/$meth");
     $uri->query_form(
-        format  => "json",
+        format  => "raw",
         key     => $self->key,
         ip      => $addr,
     );
 
-    $raw = get($uri);
-    $data = decode_json($raw);
-
-    $self->{'_RAW'} = $raw;
-
-    if ($data->{'statusCode'} ne "OK") {
-        return $self->error($data->{'statusMessage'});
+    if ($raw = get($uri)) {
+        my @f = split /;/, $raw;
+        for (my $i = 0; $i < @f; $i++) {
+            my $m = $FIELDS[ $i ];
+            $res->$m($f[ $i ]);
+        }
     }
 
-    return $data;
+
+    if ($res->status_code ne "OK") {
+        return $self->error($res->status_message);
+    }
+
+    $res->web_uri("$WEB_URI$addr");
+    $res->_raw($raw);
+
+    return $res;
 }
+
+package Net::IPInfoDB::Result;
+
+use Class::Struct;
+
+struct(
+    (map { $_ => '$' } @Net::IPInfoDB::FIELDS),
+    'web_uri' => '$',
+    '_raw'    => '$',
+);
+
+
+1;
 
 __END__
 
